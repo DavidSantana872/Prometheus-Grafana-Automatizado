@@ -17,8 +17,7 @@ echo -e "${WHITE}Elige opción"
 echo "1- Instalacion Prometheus + Grafana"
 echo "2- Instalación Node_Exporter"
 echo "3- Instalación SNMP_Exporter"
-echo "4- Configuracion Prometheus Node_Exporter"
-echo "5- Configuracion Prometheus SMNP_Exporter"
+echo "4- Añadir Jobs a Prometheus Node_Exporter + SNMP_Exporter"
 echo "Inserta opción:  "
 read option
 if [ $option  == '1' ]; then
@@ -198,6 +197,72 @@ WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/snmp_exporter.servic
         section "SNMP_Exporter listo..." $GREEN
     else 
         section "Error al descargar SNMP_Exporter" $RED
+    fi
+elif [ "$option" == 4 ]; then
+    PATH_WORK=$(pwd)
+    PROM_YML="$PATH_WORK/prometheus-3.4.0.linux-amd64/prometheus.yml"
+    NODE_TARGETS=()
+    SNMP_TARGETS=()
+
+    section "Introduce las IPs para NODE Exporter (puerto 9100) 'n' para terminar:" $WHITE
+    while true; do
+        read -p "Inserta IP para Node Exporter: " ip
+        if [[ "$ip" == "n" ]]; then
+            break
+        fi
+        NODE_TARGETS+=("\"$ip:9100\"")
+    done
+
+    section "Introduce las IPs para SNMP Exporter (puerto 9116) 'n' para terminar:" $WHITE
+    while true; do
+        read -p "Inserta IP para SNMP Exporter: " ip
+        if [[ "$ip" == "n" ]]; then
+            break
+        fi
+        SNMP_TARGETS+=("\"$ip:9116\"")
+    done
+
+    NODE_TARGETS_LINE=$(IFS=, ; echo "${NODE_TARGETS[*]}")
+    SNMP_TARGETS_LINE=$(IFS=, ; echo "${SNMP_TARGETS[*]}")
+
+    section "Añadiendo Node_Exporter a Prometheus" $WHITE
+    NODE_JOB="  - job_name: \"node_exporter\"
+    static_configs:
+      - targets: [${NODE_TARGETS_LINE}]
+        labels:
+          app: \"node_exporter\""
+
+    SNMP_JOB="  - job_name: \"snmp_exporter\"
+    static_configs:
+      - targets: [${SNMP_TARGETS_LINE}]
+        labels:
+          app: \"snmp_exporter\""
+
+#  node_exporter
+    if echo "$NODE_JOB" | sudo tee -a /tmp/node_job.yml > /dev/null && \
+    sudo sed -i "/scrape_configs:/r /tmp/node_job.yml" "$PROM_YML"; then
+
+        section "Node_Exporter añadido a Prometheus" $GREEN
+        section "Añadiendo SNMP_Exporter a Prometheus" $WHITE
+
+        # snmp_exporter
+        if echo "$SNMP_JOB" | sudo tee -a /tmp/snmp_job.yml > /dev/null && \
+        sudo sed -i "/scrape_configs:/r /tmp/snmp_job.yml" "$PROM_YML"; then
+
+            section "SNMP_Exporter añadido a Prometheus" $GREEN
+            section "Recargando demonios y reiniciando Prometheus..." $WHITE
+            sudo systemctl daemon-reload
+            sudo systemctl restart prometheus
+            section "Prometheus reiniciado" $GREEN
+        else
+            section "Error al añadir SNMP_Exporter a Prometheus" $RED
+        fi
+        # eliminar ese temporal
+        sudo rm /tmp/node_job.yml
+        sudo rm /tmp/snmp_job.yml
+    else
+        section "Error al añadir Node_Exporter a Prometheus" $RED
+
     fi
 fi
 
