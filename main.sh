@@ -12,7 +12,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 WHITE='\033[0;37m'
 NC='\033[0m'
-section -e "Tener instalado antes UFW" $RED
+section "Tener instalado antes UFW" $RED
 echo -e "${WHITE}Elige opción"
 echo "1- Instalacion Prometheus + Grafana"
 echo "2- Instalación Node_Exporter"
