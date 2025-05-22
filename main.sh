@@ -119,8 +119,41 @@ WantedBy=multi-user.target" | sudo tee /etc/systemd/system/grafana-server.servic
         section "Error al descargar Prometheus" $RED
     fi
 elif [ $option == 2 ]; then
-    echo "Instalando Node_Exporter"
-    wget
+    section "Instalando Node_Exporter" $WHITE
+    if wget "https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz"
+    then 
+        section "Descarga Node_Exporter completada" $GREEN
+        section "Descomprimiendo Node_Exporter..." $WHITE
+        tar -zxvf node_exporter-1.9.1.linux-amd64.tar.gz
+        section "Descompresión Node_Exporter completada" $GREEN
+        section "Moviendo binarios a /usr/local/bin" $WHITE
+        sudo mv node_exporter-1.9.1.linux-amd64/node_exporter /usr/local/bin/
+        section "Creando servicio Node_Exporter..." $WHITE
+        sudo touch /etc/systemd/system/node_exporter.service
+        echo "[Unit]
+Description=Node Exporter
+After=network.target
+[Service]
+User=root
+ExecStart=/usr/local/bin/node_exporter
+[Install]
+WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/node_exporter.service"
+        section "Servicio Node_Exporter creado" $GREEN
+        section "Recargando demonios..." $WHITE
+        sudo systemctl daemon-reload
+        section "Iniciando Node_Exporter..." $WHITE
+        sudo systemctl start node_exporter
+        section "Habilitando Node_Exporter..." $WHITE
+        sudo systemctl enable node_exporter
+        section "Node_Exporter iniciado y habilitado" $GREEN
+        section "Estado de Node_Exporter" $WHITE
+        sudo systemctl --no-pager status node_exporter
+        section "Node_Exporter listo..." $GREEN
+
+
+    else 
+        section "Error al descargar Node_Exporter" $RED
+    fi
 fi
 
 
