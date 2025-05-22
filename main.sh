@@ -66,7 +66,7 @@ WantedBy=multi-user.target" | sudo tee prometheus.service
         fi
         cd $PATH_WORK
         sudo apt-get install -y adduser libfontconfig1 musl
-        if wget https://dl.grafana.com/enterprise/release/grafana-enterprise_12.0.0+security~01_amd64.deb
+        if wget https://dl.grafana.com/enterprise/release/grafana-enterprise-12.0.0+security-01.linux-amd64.tar.gz
         
         #if true
         then 
