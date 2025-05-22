@@ -16,8 +16,9 @@ section "Tener instalado antes UFW" $RED
 echo -e "${WHITE}Elige opción"
 echo "1- Instalacion Prometheus + Grafana"
 echo "2- Instalación Node_Exporter"
-echo "3- Configuracion Prometheus Node_Exporter"
-echo "4- Configuracion Prometheus SMNP_Exporter"
+echo "3- Instalación SNMP_Exporter"
+echo "4- Configuracion Prometheus Node_Exporter"
+echo "5- Configuracion Prometheus SMNP_Exporter"
 echo "Inserta opción:  "
 read option
 if [ $option  == '1' ]; then
@@ -156,6 +157,47 @@ WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/node_exporter.servic
 
     else 
         section "Error al descargar Node_Exporter" $RED
+    fi
+elif [ $option == 3 ]; 
+    then
+    #if wget https://github.com/prometheus/snmp_exporter/releases/download/v0.29.0/snmp_exporter-0.29.0.linux-amd64.tar.gz
+    if true
+    then
+        PATH_WORK=$(pwd)
+        section "Descarga SNMP_Exporter completada" $GREEN
+        section "Descomprimiendo SNMP_Exporter..." $WHITE
+        tar -zxvf snmp_exporter-0.29.0.linux-amd64.tar.gz
+        section "Descompresión SNMP_Exporter completada" $GREEN
+        section "Moviendo binarios a /usr/local/bin" $WHITE
+        sudo mv snmp_exporter-0.29.0.linux-amd64/snmp_exporter /usr/local/bin/
+        section "Creando servicio SNMP_Exporter..." $WHITE
+        sudo touch /etc/systemd/system/snmp_exporter.service
+        echo "[Unit]
+Description=SNMP Exporter
+After=network-online.target
+
+# This assumes you are running snmp_exporter under the user "prometheus"
+
+[Service]
+User=root
+Restart=on-failure
+ExecStart= /usr/local/bin/snmp_exporter --config.file=$PATH_WORK/snmp_exporter-0.29.0.linux-amd64/snmp.yml
+
+[Install]
+WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/snmp_exporter.service"
+        section "Servicio SNMP_Exporter creado" $GREEN
+        section "Recargando demonios..." $WHITE
+        sudo systemctl daemon-reload
+        section "Iniciando SNMP_Exporter..." $WHITE
+        sudo systemctl start snmp_exporter
+        section "Habilitando SNMP_Exporter..." $WHITE
+        sudo systemctl enable snmp_exporter
+        section "SNMP_Exporter iniciado y habilitado" $GREEN
+        section "Estado de SNMP_Exporter" $WHITE
+        sudo systemctl --no-pager status snmp_exporter
+        section "SNMP_Exporter listo..." $GREEN
+    else 
+        section "Error al descargar SNMP_Exporter" $RED
     fi
 fi
 
