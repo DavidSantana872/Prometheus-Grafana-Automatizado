@@ -21,8 +21,8 @@ echo "Inserta opción:  "
 read option
 if [ $option  == '1' ]; then
     section "Descargando Prometheus.." $GREEN
-    #if wget  "https://github.com/prometheus/prometheus/releases/download/v3.4.0/prometheus-3.4.0.linux-amd64.tar.gz"
-    if true
+    if wget  "https://github.com/prometheus/prometheus/releases/download/v3.4.0/prometheus-3.4.0.linux-amd64.tar.gz"
+    #if true
     then
         PATH_WORK=$(pwd)
         section "Prometheus Descargado!" $GREEN
@@ -66,9 +66,9 @@ WantedBy=multi-user.target" | sudo tee prometheus.service
         fi
         cd $PATH_WORK
         sudo apt-get install -y adduser libfontconfig1 musl
-        #if wget https://dl.grafana.com/enterprise/release/grafana-enterprise_12.0.0+security~01_amd64.deb
+        if wget https://dl.grafana.com/enterprise/release/grafana-enterprise_12.0.0+security~01_amd64.deb
         
-        if true
+        #if true
         then 
             section "Descarga Grafana completada" $GREEN
             section "Descomprimiendo Grafana..." $WHITE
