@@ -160,8 +160,8 @@ WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/node_exporter.servic
     fi
 elif [ $option == 3 ]; 
     then
-    #if wget https://github.com/prometheus/snmp_exporter/releases/download/v0.29.0/snmp_exporter-0.29.0.linux-amd64.tar.gz
-    if true
+    if wget https://github.com/prometheus/snmp_exporter/releases/download/v0.29.0/snmp_exporter-0.29.0.linux-amd64.tar.gz
+    
     then
         PATH_WORK=$(pwd)
         section "Descarga SNMP_Exporter completada" $GREEN
