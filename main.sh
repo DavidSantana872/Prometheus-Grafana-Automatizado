@@ -12,6 +12,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 WHITE='\033[0;37m'
 NC='\033[0m'
+section -e "Tener instalado antes UFW" $RED
 echo -e "${WHITE}Elige opción"
 echo "1- Instalacion Prometheus + Grafana"
 echo "2- Instalación Node_Exporter"
@@ -149,6 +150,8 @@ WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/node_exporter.servic
         section "Estado de Node_Exporter" $WHITE
         sudo systemctl --no-pager status node_exporter
         section "Node_Exporter listo..." $GREEN
+        sudo ufw allow 9100
+        sudo ufw status
 
 
     else 
