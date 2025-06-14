@@ -7,6 +7,7 @@ section() {
   echo ""
 }
 option=0
+continue=0
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -55,6 +56,8 @@ WantedBy=multi-user.target" | sudo tee prometheus.service
         sudo systemctl --no-pager status prometheus
         section "Prometheus listo..." $GREEN
 
+        section "1 para continuar instalacion de grafana o " $RED
+        read continue
         section "Instalación Grafana" $WHITE
         if command -v sqlite3 >/dev/null 2>&1; then
             section "sqlite3 OK!" $GREEN
